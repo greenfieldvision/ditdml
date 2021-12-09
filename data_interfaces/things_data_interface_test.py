@@ -22,6 +22,7 @@ def class_name(class_index):
 class ThingsDataInterfaceTest(unittest.TestCase):
     def test_quasi_original_split(self):
         with tempfile.TemporaryDirectory() as data_directory_name:
+            # Create resource files.
             os.makedirs(os.path.join(data_directory_name, "Main"))
 
             with open(os.path.join(data_directory_name, "Main", "things_concepts.tsv"), "wt") as f:
@@ -68,8 +69,7 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             )
 
             # Make data interface object and check its triplets and prototypes.
-            data_interface = ThingsDataInterface(data_directory_name, "quasi_original", 99)
-            reader = data_interface.reader
+            data_interface = ThingsDataInterface(data_directory_name, "quasi_original", 42)
 
             self.assertCountEqual(data_interface.triplets_by_subset.keys(), {"training", "validation", "test"})
             for triplets in data_interface.triplets_by_subset.values():
@@ -89,10 +89,32 @@ class ThingsDataInterfaceTest(unittest.TestCase):
 
             self.assertEqual(len(data_interface.prototypes_per_class), data_interface.reader.num_classes)
             for c, p in enumerate(data_interface.prototypes_per_class):
-                self.assertEqual(reader.image_records[p][1], c)
+                self.assertEqual(data_interface.reader.image_records[p][1], c)
+
+            # Make another data interface object and check that its triplets and prototypes are different from the first
+            # object's.
+            data_interface2 = ThingsDataInterface(data_directory_name, "quasi_original", 24)
+
+            self.assertNotEqual(data_interface.prototypes_per_class, data_interface2.prototypes_per_class)
+            classes_per_prototype = {p: c for c, p in enumerate(data_interface.prototypes_per_class)}
+            classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
+
+            for subset_name in ["training", "validation"]:
+
+                def to_class_triplet_strings(p2c, ts):
+                    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
+
+                triplets = to_class_triplet_strings(
+                    classes_per_prototype, data_interface.triplets_by_subset[subset_name]
+                )
+                triplets2 = to_class_triplet_strings(
+                    classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
+                )
+                self.assertNotEqual(triplets, triplets2)
 
     def test_by_class_split(self):
         with tempfile.TemporaryDirectory() as data_directory_name:
+            # Create resource files.
             os.makedirs(os.path.join(data_directory_name, "Main"))
 
             with open(os.path.join(data_directory_name, "Main", "things_concepts.tsv"), "wt") as f:
@@ -139,8 +161,7 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             )
 
             # Make data interface object and check its triplets and prototypes.
-            data_interface = ThingsDataInterface(data_directory_name, "by_class", 98)
-            reader = data_interface.reader
+            data_interface = ThingsDataInterface(data_directory_name, "by_class", 42)
 
             classes_by_subset = {"training": set(), "validation": set(), "test": set()}
             for subset_name, triplets in data_interface.triplets_by_subset.items():
@@ -155,4 +176,25 @@ class ThingsDataInterfaceTest(unittest.TestCase):
 
             self.assertEqual(len(data_interface.prototypes_per_class), data_interface.reader.num_classes)
             for c, p in enumerate(data_interface.prototypes_per_class):
-                self.assertEqual(reader.image_records[p][1], c)
+                self.assertEqual(data_interface.reader.image_records[p][1], c)
+
+            # Make another data interface object and check that its triplets and prototypes are different from the first
+            # object's.
+            data_interface2 = ThingsDataInterface(data_directory_name, "by_class", 24)
+
+            self.assertNotEqual(data_interface.prototypes_per_class, data_interface2.prototypes_per_class)
+            classes_per_prototype = {p: c for c, p in enumerate(data_interface.prototypes_per_class)}
+            classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
+
+            for subset_name in ["training", "validation", "test"]:
+
+                def to_class_triplet_strings(p2c, ts):
+                    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
+
+                triplets = to_class_triplet_strings(
+                    classes_per_prototype, data_interface.triplets_by_subset[subset_name]
+                )
+                triplets2 = to_class_triplet_strings(
+                    classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
+                )
+                self.assertNotEqual(triplets, triplets2)

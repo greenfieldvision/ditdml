@@ -29,7 +29,7 @@ class ThingsDataInterface:
         self._choose_prototypes()
 
         # Split the raw set of triplets into training, validation and test based on the specified split type.
-        random.seed(seed + 1)
+        random.seed(seed)
         self._split_triplets(split_type)
 
         print("done ({:.2f} s)".format(time.time() - start_time))
@@ -83,7 +83,7 @@ class ThingsDataInterface:
             high_overlap_test_triplets = list(high_overlap_test_triplets)
 
             # Randomly split the triplets with <=1 test classes into 80% training and 20% validation.
-            # random.shuffle(low_overlap_test_triplets)
+            random.shuffle(low_overlap_test_triplets)
             i = int(self.TRAINING_FRACTION1 * len(low_overlap_test_triplets))
             class_triplets_by_subset = {
                 "training": low_overlap_test_triplets[:i],
