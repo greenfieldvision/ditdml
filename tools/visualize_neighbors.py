@@ -1,3 +1,5 @@
+"""GUI showing the nearest classes according to the provided embedding."""
+
 import argparse
 import sys
 
@@ -68,7 +70,7 @@ class NeighborVisualization:
         # Make the visualization image by resizing the class and neighbor images and placing them side-by-side.
         visualization_image = Image.new("RGB", ((self.num_neighbors + 1) * VISUALIZATION_WIDTH, VISUALIZATION_HEIGHT))
         for i, image in enumerate(images):
-            # Resize image and write class name at top left corner.
+            # Resize image and write class name and distance to current class at top left corner.
             resized_image = image.resize((VISUALIZATION_WIDTH, VISUALIZATION_HEIGHT))
             text = class_names[i] + (" {:.2f}".format(distances[i]) if i > 0 else "")
             draw_text(resized_image, text, (0, 0))

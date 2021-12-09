@@ -1,3 +1,5 @@
+"""GUI showing the labeled triplets."""
+
 import argparse
 import sys
 

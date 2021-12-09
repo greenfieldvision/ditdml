@@ -1,3 +1,5 @@
+"""Data statistics: number of images, classes and triplets in each subset."""
+
 import argparse
 
 from ditdml.data_interfaces.things_data_interface import ThingsDataInterface

@@ -1,3 +1,5 @@
+"""GUI showing the similarity matrix for the test classes."""
+
 import argparse
 import sys
 
