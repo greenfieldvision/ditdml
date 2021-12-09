@@ -70,6 +70,7 @@ class TripletVisualization:
         self.label.pack()
 
     def left_fn(self, _):
+        # Move cursor left if within valid range.
         if self.triplet_index > 0:
             self.triplet_index -= 1
 
@@ -77,7 +78,8 @@ class TripletVisualization:
         self.visualize()
 
     def right_fn(self, _):
-        if self.triplet_index < len(self.image_records) - 1:
+        # Move cursor right if within valid range.
+        if self.triplet_index < len(self.triplets) - 1:
             self.triplet_index += 1
 
         # Update the visualization in response to the keypress.
