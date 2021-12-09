@@ -10,6 +10,7 @@ The code is close to production grade and provides an effective way to access tr
 * more_itertools
 * numpy
 * scipy
+* scikit-learn
 * Pillow
 * Tkinter
 
@@ -46,6 +47,15 @@ To interactively visualize labeled triplets:
 ```
 python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type quasi_original --seed 15
 python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type quasi_original --seed 16 --subset-name test --initial-triplet-index 200
+```
+
+(press left, right arrows)
+
+To interactively visualize neighbors according to the provided embedding:
+
+```
+python ditdml/tools/visualize_neighbors.py --data-directory-name {THINGS_ROOT}
+python ditdml/tools/visualize_neighbors.py --data-directory-name {THINGS_ROOT} --num-neighbors 4 --initial-class-index 1854
 ```
 
 (press left, right arrows)
