@@ -6,6 +6,10 @@ from more_itertools import partition, random_permutation
 from ditdml.data_interfaces.things_reader import ThingsReader
 
 
+def triplets_fully_in(class_triplets, classes):
+    return filter(lambda t: len(classes.intersection(t)) == 3, class_triplets)
+
+
 class ThingsDataInterface:
     """Interface to data the THINGS dataset: image file names and triplets split into training, validation and test.
 
@@ -15,6 +19,7 @@ class ThingsDataInterface:
 
     TRAINING_FRACTION1 = 0.8
     TRAINING_FRACTION2, VALIDATION_FRACTION2 = 0.6, 0.2
+    TRAINING_FRACTION3 = 0.8
 
     def __init__(self, directory_name, split_type, seed):
         # Make reader object that loads the data from the specified directory.
@@ -92,8 +97,9 @@ class ThingsDataInterface:
             }
 
         elif split_type == "by_class":
-            # Split type based on classes. Classes are first split into training, validation and test and then the
-            # triplets that have all the classes in one of the three subsets are retained.
+            # Split type based on classes. First, classes are split into training, validation and test (60%, 20%, 20%)
+            # and then triplets are split into these three subsets according to the class split. Triplets that do not
+            # have all classes in the same subset (ie either all training, all validation or all test) are discarded.
 
             # Randomly permute class indexes.
             classes = random_permutation(range(self._reader.num_classes))
@@ -107,13 +113,40 @@ class ThingsDataInterface:
 
             # Assign each triplet to one of training, validation and test if all the triplet classes belong to that
             # subset.
-            def triplet_fully_in(classes):
-                return filter(lambda t: len(classes.intersection(t)) == 3, class_triplets)
-
             class_triplets_by_subset = {
-                "training": triplet_fully_in(training_classes),
-                "validation": triplet_fully_in(validation_classes),
-                "test": triplet_fully_in(test_classes),
+                "training": triplets_fully_in(class_triplets, training_classes),
+                "validation": triplets_fully_in(class_triplets, validation_classes),
+                "test": triplets_fully_in(class_triplets, test_classes),
+            }
+
+        elif split_type == "by_class_same_training_validation":
+            # Split type based on classes. First, classes are split into training+validation and test (80%, 20%), then
+            # triplets are split into these two subsets according to the class split. Finally, the training+validation
+            # triplets are split randomly into 80% training and 20% validation.
+
+            # Randomly permute class indexes.
+            classes = random_permutation(range(self._reader.num_classes))
+
+            # Split class indexes into 80% training+validation and 20% testing.
+            i = int((self.TRAINING_FRACTION2 + self.VALIDATION_FRACTION2) * len(classes))
+            training_validation_classes = set(classes[:i])
+            test_classes = set(classes[i:])
+
+            # Split triplets into training+validation and test according to the class split.
+            training_validation_triplets = list(triplets_fully_in(class_triplets, training_validation_classes))
+            test_triplets = triplets_fully_in(class_triplets, test_classes)
+
+            # Randomly split the triplets in training+validation into 80% for training and 20% for validation.
+            random.shuffle(training_validation_triplets)
+            j = int(self.TRAINING_FRACTION3 * len(training_validation_triplets))
+            training_triplets = training_validation_triplets[:j]
+            validation_triplets = training_validation_triplets[j:]
+
+            # Make the triplet assignment object.
+            class_triplets_by_subset = {
+                "training": training_triplets,
+                "validation": validation_triplets,
+                "test": test_triplets,
             }
 
         else:

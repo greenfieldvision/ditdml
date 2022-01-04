@@ -40,6 +40,7 @@ To see statistics like the number of images etc:
 ```
 python ditdml/tools/report_data_statistics.py --data-directory-name {THINGS_ROOT} --split-type quasi_original --seed 13
 python ditdml/tools/report_data_statistics.py --data-directory-name {THINGS_ROOT} --split-type by_class --seed 14
+python ditdml/tools/report_data_statistics.py --data-directory-name {THINGS_ROOT} --split-type by_class_same_training_validation --seed 15
 ```
 
 To interactively visualize labeled triplets:
