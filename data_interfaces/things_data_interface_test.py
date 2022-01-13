@@ -15,8 +15,12 @@ NUM_IMAGES_PER_CLASS = 2
 NUM_TRIPLETS = 1000
 
 
-def class_name(class_index):
+def _class_name(class_index):
     return "class{:02d}".format(class_index)
+
+
+def _to_class_triplet_strings(p2c, ts):
+    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
 
 
 class ThingsDataInterfaceTest(unittest.TestCase):
@@ -28,10 +32,10 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             with open(os.path.join(data_directory_name, "Main", "things_concepts.tsv"), "wt") as f:
                 f.write("Word\tuniqueID\n")
                 for i in range(NUM_CLASSES):
-                    f.write("{class_name}\t{class_name}\n".format(class_name=class_name(i)))
+                    f.write("{class_name}\t{class_name}\n".format(class_name=_class_name(i)))
 
             for i in range(NUM_CLASSES):
-                subdirectory_name = os.path.join(data_directory_name, "Main", class_name(i))
+                subdirectory_name = os.path.join(data_directory_name, "Main", _class_name(i))
                 os.makedirs(subdirectory_name)
                 for j in range(NUM_IMAGES_PER_CLASS):
                     open(os.path.join(subdirectory_name, f"image_{j}.jpg"), "wt")
@@ -65,10 +69,10 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             )
             scipy.io.savemat(
                 os.path.join(subdirectory_name, "words48.mat"),
-                {"words48": [[[np.array(class_name(i))]] for i in range(NUM_CLASSES - NUM_TEST_CLASSES, NUM_CLASSES)]},
+                {"words48": [[[np.array(_class_name(i))]] for i in range(NUM_CLASSES - NUM_TEST_CLASSES, NUM_CLASSES)]},
             )
 
-            # Make data interface object and check its triplets and prototypes.
+            # Make data interface object and check its triplets, instances and prototypes.
             data_interface = ThingsDataInterface(data_directory_name, "quasi_original", 42)
 
             self.assertCountEqual(data_interface.triplets_by_subset.keys(), {"training", "validation", "test"})
@@ -94,23 +98,7 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             # Make another data interface object and check that its triplets and prototypes are different from the first
             # object's.
             data_interface2 = ThingsDataInterface(data_directory_name, "quasi_original", 24)
-
-            self.assertNotEqual(data_interface.prototypes_per_class, data_interface2.prototypes_per_class)
-            classes_per_prototype = {p: c for c, p in enumerate(data_interface.prototypes_per_class)}
-            classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
-
-            for subset_name in ["training", "validation"]:
-
-                def to_class_triplet_strings(p2c, ts):
-                    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
-
-                triplets = to_class_triplet_strings(
-                    classes_per_prototype, data_interface.triplets_by_subset[subset_name]
-                )
-                triplets2 = to_class_triplet_strings(
-                    classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
-                )
-                self.assertNotEqual(triplets, triplets2)
+            self._check_different(data_interface, data_interface2, ["training", "validation"])
 
     def test_by_class_split(self):
         with tempfile.TemporaryDirectory() as data_directory_name:
@@ -120,10 +108,10 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             with open(os.path.join(data_directory_name, "Main", "things_concepts.tsv"), "wt") as f:
                 f.write("Word\tuniqueID\n")
                 for i in range(NUM_CLASSES):
-                    f.write("{class_name}\t{class_name}\n".format(class_name=class_name(i)))
+                    f.write("{class_name}\t{class_name}\n".format(class_name=_class_name(i)))
 
             for i in range(NUM_CLASSES):
-                subdirectory_name = os.path.join(data_directory_name, "Main", class_name(i))
+                subdirectory_name = os.path.join(data_directory_name, "Main", _class_name(i))
                 os.makedirs(subdirectory_name)
                 for j in range(NUM_IMAGES_PER_CLASS):
                     open(os.path.join(subdirectory_name, f"image_{j}.jpg"), "wt")
@@ -157,10 +145,10 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             )
             scipy.io.savemat(
                 os.path.join(subdirectory_name, "words48.mat"),
-                {"words48": [[[np.array(class_name(i))]] for i in range(NUM_CLASSES - NUM_TEST_CLASSES, NUM_CLASSES)]},
+                {"words48": [[[np.array(_class_name(i))]] for i in range(NUM_CLASSES - NUM_TEST_CLASSES, NUM_CLASSES)]},
             )
 
-            # Make data interface object and check its triplets and prototypes.
+            # Make data interface object and check its triplets, instances and prototypes.
             data_interface = ThingsDataInterface(data_directory_name, "by_class", 42)
 
             classes_by_subset = {"training": set(), "validation": set(), "test": set()}
@@ -178,26 +166,12 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             for c, p in enumerate(data_interface.prototypes_per_class):
                 self.assertEqual(data_interface.reader.image_records[p][1], c)
 
+            self._check_instances_triplets(data_interface)
+
             # Make another data interface object and check that its triplets and prototypes are different from the first
             # object's.
             data_interface2 = ThingsDataInterface(data_directory_name, "by_class", 24)
-
-            self.assertNotEqual(data_interface.prototypes_per_class, data_interface2.prototypes_per_class)
-            classes_per_prototype = {p: c for c, p in enumerate(data_interface.prototypes_per_class)}
-            classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
-
-            for subset_name in ["training", "validation", "test"]:
-
-                def to_class_triplet_strings(p2c, ts):
-                    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
-
-                triplets = to_class_triplet_strings(
-                    classes_per_prototype, data_interface.triplets_by_subset[subset_name]
-                )
-                triplets2 = to_class_triplet_strings(
-                    classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
-                )
-                self.assertNotEqual(triplets, triplets2)
+            self._check_different(data_interface, data_interface2, ["training", "validation", "test"])
 
     def test_by_class_by_class_same_training_validation(self):
         with tempfile.TemporaryDirectory() as data_directory_name:
@@ -207,10 +181,10 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             with open(os.path.join(data_directory_name, "Main", "things_concepts.tsv"), "wt") as f:
                 f.write("Word\tuniqueID\n")
                 for i in range(NUM_CLASSES):
-                    f.write("{class_name}\t{class_name}\n".format(class_name=class_name(i)))
+                    f.write("{class_name}\t{class_name}\n".format(class_name=_class_name(i)))
 
             for i in range(NUM_CLASSES):
-                subdirectory_name = os.path.join(data_directory_name, "Main", class_name(i))
+                subdirectory_name = os.path.join(data_directory_name, "Main", _class_name(i))
                 os.makedirs(subdirectory_name)
                 for j in range(NUM_IMAGES_PER_CLASS):
                     open(os.path.join(subdirectory_name, f"image_{j}.jpg"), "wt")
@@ -244,10 +218,10 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             )
             scipy.io.savemat(
                 os.path.join(subdirectory_name, "words48.mat"),
-                {"words48": [[[np.array(class_name(i))]] for i in range(NUM_CLASSES - NUM_TEST_CLASSES, NUM_CLASSES)]},
+                {"words48": [[[np.array(_class_name(i))]] for i in range(NUM_CLASSES - NUM_TEST_CLASSES, NUM_CLASSES)]},
             )
 
-            # Make data interface object and check its triplets and prototypes.
+            # Make data interface object and check its triplets, instances and prototypes.
             data_interface = ThingsDataInterface(data_directory_name, "by_class_same_training_validation", 42)
 
             classes_by_subset = {"training": set(), "validation": set(), "test": set()}
@@ -265,23 +239,30 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             for c, p in enumerate(data_interface.prototypes_per_class):
                 self.assertEqual(data_interface.reader.image_records[p][1], c)
 
+            self._check_instances_triplets(data_interface)
+
             # Make another data interface object and check that its triplets and prototypes are different from the first
             # object's.
             data_interface2 = ThingsDataInterface(data_directory_name, "by_class_same_training_validation", 24)
+            self._check_different(data_interface, data_interface2, ["training", "validation", "test"])
 
-            self.assertNotEqual(data_interface.prototypes_per_class, data_interface2.prototypes_per_class)
-            classes_per_prototype = {p: c for c, p in enumerate(data_interface.prototypes_per_class)}
-            classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
+    def _check_different(self, data_interface1, data_interface2, subset_names):
+        self.assertNotEqual(data_interface1.prototypes_per_class, data_interface2.prototypes_per_class)
 
-            for subset_name in ["training", "validation", "test"]:
+        classes_per_prototype1 = {p: c for c, p in enumerate(data_interface1.prototypes_per_class)}
+        classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
+        for subset_name in subset_names:
+            triplets1 = _to_class_triplet_strings(
+                classes_per_prototype1, data_interface1.triplets_by_subset[subset_name]
+            )
+            triplets2 = _to_class_triplet_strings(
+                classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
+            )
+            self.assertNotEqual(triplets1, triplets2)
 
-                def to_class_triplet_strings(p2c, ts):
-                    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
-
-                triplets = to_class_triplet_strings(
-                    classes_per_prototype, data_interface.triplets_by_subset[subset_name]
-                )
-                triplets2 = to_class_triplet_strings(
-                    classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
-                )
-                self.assertNotEqual(triplets, triplets2)
+    def _check_instances_triplets(self, data_interface, subset_names=["training", "validation", "test"]):
+        for subset_name in subset_names:
+            instance_set = set(data_interface.instances_by_subset[subset_name])
+            for t in data_interface.triplets_by_subset[subset_name]:
+                for i in t:
+                    self.assertIn(i, instance_set)

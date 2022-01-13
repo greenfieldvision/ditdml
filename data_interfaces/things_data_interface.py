@@ -7,7 +7,7 @@ from ditdml.data_interfaces.things_reader import ThingsReader
 
 
 def triplets_fully_in(class_triplets, classes):
-    return filter(lambda t: len(classes.intersection(t)) == 3, class_triplets)
+    return list(filter(lambda t: len(classes.intersection(t)) == 3, class_triplets))
 
 
 class ThingsDataInterface:
@@ -45,7 +45,15 @@ class ThingsDataInterface:
 
     @property
     def triplets_by_subset(self):
+        """Triplets of instance indexes for training, validation and test."""
+
         return self._triplets_by_subset
+
+    @property
+    def instances_by_subset(self):
+        """Instance indexes for training, validation and test."""
+
+        return self._instances_by_subset
 
     @property
     def prototypes_per_class(self):
@@ -80,9 +88,9 @@ class ThingsDataInterface:
 
             # Partition original triplet set into two subsets, according to the number of test classes in a triplet
             # (<=1 or >=2).
-            classes_test = set(self._reader.classes_original_test)
+            test_classes = set(self._reader.classes_original_test)
             high_overlap_test_triplets, low_overlap_test_triplets = partition(
-                lambda t: len(classes_test.intersection(t)) <= 1, class_triplets
+                lambda t: len(test_classes.intersection(t)) <= 1, class_triplets
             )
             low_overlap_test_triplets = list(low_overlap_test_triplets)
             high_overlap_test_triplets = list(high_overlap_test_triplets)
@@ -94,6 +102,14 @@ class ThingsDataInterface:
                 "training": low_overlap_test_triplets[:i],
                 "validation": low_overlap_test_triplets[i:],
                 "test": high_overlap_test_triplets,
+            }
+
+            # Save the class assignments.
+            training_validation_classes = set(range(self._reader.num_classes)).difference(test_classes)
+            classes_by_subset = {
+                "training": training_validation_classes,
+                "validation": training_validation_classes,
+                "test": test_classes,
             }
 
         elif split_type == "by_class":
@@ -119,6 +135,13 @@ class ThingsDataInterface:
                 "test": triplets_fully_in(class_triplets, test_classes),
             }
 
+            # Save the class assignments.
+            classes_by_subset = {
+                "training": training_classes,
+                "validation": validation_classes,
+                "test": test_classes,
+            }
+
         elif split_type == "by_class_same_training_validation":
             # Split type based on classes. First, classes are split into training+validation and test (80%, 20%), then
             # triplets are split into these two subsets according to the class split. Finally, the training+validation
@@ -133,7 +156,7 @@ class ThingsDataInterface:
             test_classes = set(classes[i:])
 
             # Split triplets into training+validation and test according to the class split.
-            training_validation_triplets = list(triplets_fully_in(class_triplets, training_validation_classes))
+            training_validation_triplets = triplets_fully_in(class_triplets, training_validation_classes)
             test_triplets = triplets_fully_in(class_triplets, test_classes)
 
             # Randomly split the triplets in training+validation into 80% for training and 20% for validation.
@@ -142,19 +165,29 @@ class ThingsDataInterface:
             training_triplets = training_validation_triplets[:j]
             validation_triplets = training_validation_triplets[j:]
 
-            # Make the triplet assignment object.
+            # Save the triplet and class assignments.
             class_triplets_by_subset = {
                 "training": training_triplets,
                 "validation": validation_triplets,
                 "test": test_triplets,
             }
+            classes_by_subset = {
+                "training": training_validation_classes,
+                "validation": training_validation_classes,
+                "test": test_classes,
+            }
 
         else:
             # Unrecognized split type. All subsets are empty.
             class_triplets_by_subset = {"training": [], "validation": [], "test": []}
+            classes_by_subset = {"training": [], "validation": [], "test": []}
 
-        # Replace class indexes with prototype image indexes.
+        # Replace class indexes with prototype image indexes for both triplets and instances.
         self._triplets_by_subset = {
             subset_name: [[self._prototypes_per_class[c] for c in t] for t in triplets]
             for subset_name, triplets in class_triplets_by_subset.items()
+        }
+        self._instances_by_subset = {
+            subset_name: [self._prototypes_per_class[c] for c in classes]
+            for subset_name, classes in classes_by_subset.items()
         }
