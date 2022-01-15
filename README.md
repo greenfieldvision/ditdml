@@ -48,6 +48,10 @@ To interactively visualize labeled triplets:
 ```
 python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type quasi_original --seed 15
 python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type quasi_original --seed 16 --subset-name test --initial-triplet-index 200
+python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type quasi_original --seed 16 --subset-name test --initial-triplet-index 2866
+
+python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type by_class --seed 17 --initial-triplet-index 0
+python ditdml/tools/visualize_triplets.py --data-directory-name {THINGS_ROOT} --split-type by_class --seed 17 --initial-triplet-index 315715
 ```
 
 (press left, right arrows)

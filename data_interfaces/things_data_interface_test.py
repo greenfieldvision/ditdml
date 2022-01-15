@@ -19,8 +19,8 @@ def _class_name(class_index):
     return "class{:02d}".format(class_index)
 
 
-def _to_class_triplet_strings(p2c, ts):
-    return set([" ".join([str(p2c[p]) for p in t]) for t in ts])
+def _to_class_triplet_strings(i2c, ts):
+    return set([" ".join([str(i2c[p]) for p in t]) for t in ts])
 
 
 class ThingsDataInterfaceTest(unittest.TestCase):
@@ -246,23 +246,19 @@ class ThingsDataInterfaceTest(unittest.TestCase):
             data_interface2 = ThingsDataInterface(data_directory_name, "by_class_same_training_validation", 24)
             self._check_different(data_interface, data_interface2, ["training", "validation", "test"])
 
-    def _check_different(self, data_interface1, data_interface2, subset_names):
-        self.assertNotEqual(data_interface1.prototypes_per_class, data_interface2.prototypes_per_class)
-
-        classes_per_prototype1 = {p: c for c, p in enumerate(data_interface1.prototypes_per_class)}
-        classes_per_prototype2 = {p: c for c, p in enumerate(data_interface2.prototypes_per_class)}
-        for subset_name in subset_names:
-            triplets1 = _to_class_triplet_strings(
-                classes_per_prototype1, data_interface1.triplets_by_subset[subset_name]
-            )
-            triplets2 = _to_class_triplet_strings(
-                classes_per_prototype2, data_interface2.triplets_by_subset[subset_name]
-            )
-            self.assertNotEqual(triplets1, triplets2)
-
     def _check_instances_triplets(self, data_interface, subset_names=["training", "validation", "test"]):
         for subset_name in subset_names:
             instance_set = set(data_interface.instances_by_subset[subset_name])
             for t in data_interface.triplets_by_subset[subset_name]:
                 for i in t:
                     self.assertIn(i, instance_set)
+
+    def _check_different(self, data_interface1, data_interface2, subset_names):
+        self.assertNotEqual(data_interface1.prototypes_per_class, data_interface2.prototypes_per_class)
+
+        class_per_instance1 = {i: r[1] for i, r in enumerate(data_interface1.reader.image_records)}
+        class_per_instance2 = {i: r[1] for i, r in enumerate(data_interface1.reader.image_records)}
+        for subset_name in subset_names:
+            triplets1 = _to_class_triplet_strings(class_per_instance1, data_interface1.triplets_by_subset[subset_name])
+            triplets2 = _to_class_triplet_strings(class_per_instance2, data_interface2.triplets_by_subset[subset_name])
+            self.assertNotEqual(triplets1, triplets2)

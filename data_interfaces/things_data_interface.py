@@ -21,9 +21,16 @@ class ThingsDataInterface:
     TRAINING_FRACTION2, VALIDATION_FRACTION2 = 0.6, 0.2
     TRAINING_FRACTION3 = 0.8
 
+    NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET = 15
+
     def __init__(self, directory_name, split_type, seed):
         # Make reader object that loads the data from the specified directory.
         self._reader = ThingsReader(directory_name)
+
+        # Make list of image indexes per class index.
+        self._instances_per_class = [[] for _ in range(self._reader.num_classes)]
+        for i, r in enumerate(self._reader.image_records):
+            self._instances_per_class[r[1]].append(i)
 
         # Report times for splitting operations.
         print("splitting THINGS data...")
@@ -62,15 +69,10 @@ class ThingsDataInterface:
     def _choose_prototypes(self):
         """Selects a single image for each class randomly."""
 
-        num_classes = self._reader.num_classes
-
-        # Make list of image indexes per class index.
-        images_per_class = [[] for _ in range(num_classes)]
-        for i, r in enumerate(self._reader.image_records):
-            images_per_class[r[1]].append(i)
-
         # Randomly choose an image index for each class index.
-        self._prototypes_per_class = [random.choice(images_per_class[c]) for c in range(num_classes)]
+        self._prototypes_per_class = [
+            random.choice(self._instances_per_class[c]) for c in range(self._reader.num_classes)
+        ]
 
     def _split_triplets(self, split_type):
         """Splits the original set of triplets into subsets for training, validation and test.
@@ -182,12 +184,34 @@ class ThingsDataInterface:
             class_triplets_by_subset = {"training": [], "validation": [], "test": []}
             classes_by_subset = {"training": [], "validation": [], "test": []}
 
-        # Replace class indexes with prototype image indexes for both triplets and instances.
-        self._triplets_by_subset = {
-            subset_name: [[self._prototypes_per_class[c] for c in t] for t in triplets]
-            for subset_name, triplets in class_triplets_by_subset.items()
-        }
-        self._instances_by_subset = {
-            subset_name: [self._prototypes_per_class[c] for c in classes]
-            for subset_name, classes in classes_by_subset.items()
-        }
+        # Switch on split type.
+        if split_type in {"quasi_original", "by_class_same_training_validation"}:
+            # Replace class indexes with prototype image indexes for triplets.
+            self._triplets_by_subset = {
+                subset_name: [[self._prototypes_per_class[c] for c in ct] for ct in class_triplets]
+                for subset_name, class_triplets in class_triplets_by_subset.items()
+            }
+
+            # Replace class indexes with prototype image indexes for subsets.
+            self._instances_by_subset = {
+                subset_name: [self._prototypes_per_class[c] for c in classes]
+                for subset_name, classes in classes_by_subset.items()
+            }
+
+        elif split_type == "by_class":
+            # For each triplet, sample an image index from each class (instead of choosing the prototype). The number
+            # of samples per class triplet is set so each image in the three classes will likely appear at least once
+            # in the image triplets.
+            self._triplets_by_subset = {subset_name: [] for subset_name in class_triplets_by_subset}
+            for _ in range(self.NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET):
+                for subset_name, class_triplets in class_triplets_by_subset.items():
+                    current_triplets = [
+                        [random.choice(self._instances_per_class[c]) for c in ct] for ct in class_triplets
+                    ]
+                    self._triplets_by_subset[subset_name].extend(current_triplets)
+
+            # Get the image indexes for each class.
+            self._instances_by_subset = {
+                subset_name: [i for c in classes for i in self._instances_per_class[c]]
+                for subset_name, classes in classes_by_subset.items()
+            }
