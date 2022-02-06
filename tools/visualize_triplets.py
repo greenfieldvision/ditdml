@@ -7,8 +7,10 @@ import tkinter as tk
 
 from PIL import Image, ImageTk
 
-from ditdml.data_interfaces.things_data_interface import ThingsDataInterface
+# TODO: figure out why importing ImageDraw before tf (indirectly) => crash
 from ditdml.tools.visualization_utils import draw_text
+from ditdml.data_interfaces.things_data_interface import ThingsDataInterface
+from ditdml.data_interfaces.ihsj_data_interface import IHSJDataInterface
 
 
 VISUALIZATION_WIDTH, VISUALIZATION_HEIGHT = 512, 512
@@ -52,7 +54,7 @@ class TripletVisualization:
         # Load the images of the current triplet.
         triplet = self.triplets[self.triplet_index]
         records = [self.image_records[image_index] for image_index in triplet]
-        images = [Image.open(record[0]) for record in records]
+        images = [Image.open(record[0]).convert("RGB") for record in records]
         class_names = [self.class_names[record[1]] for record in records]
 
         # Make the visualization image by resizing the three images and placing them side-by-side.
@@ -94,6 +96,7 @@ class TripletVisualization:
 if __name__ == "__main__":
     # Parse command line arguments.
     parser = argparse.ArgumentParser()
+    parser.add_argument("--dataset-name", help="Name of dataset.", required=True, choices=["things", "ihsj"])
     parser.add_argument("--data-directory-name", help="Root folder for the raw data.", required=True)
     parser.add_argument("--split-type", help="Dataset split type.", required=True)
     parser.add_argument("--seed", help="Seed for random number generator.", type=int, required=True)
@@ -102,5 +105,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Make the data interface object and start the visualization.
-    data_interface = ThingsDataInterface(args.data_directory_name, args.split_type, args.seed)
+    if args.dataset_name == "things":
+        data_interface = ThingsDataInterface(args.data_directory_name, args.split_type, args.seed)
+    elif args.dataset_name == "ihsj":
+        data_interface = IHSJDataInterface(args.data_directory_name, args.split_type, args.seed)
+    else:
+        data_interface = None
     TripletVisualization(data_interface, args.subset_name, args.initial_triplet_index - 1)
