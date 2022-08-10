@@ -215,3 +215,7 @@ class ThingsDataInterface:
                 subset_name: [i for c in classes for i in self._instances_per_class[c]]
                 for subset_name, classes in classes_by_subset.items()
             }
+
+        else:
+            # Unrecognized split type. All subsets are empty.
+            self._instances_by_subset = {"training": [], "validation": [], "test": []}

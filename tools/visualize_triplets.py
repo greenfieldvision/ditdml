@@ -11,6 +11,7 @@ from PIL import Image, ImageTk
 from ditdml.tools.visualization_utils import draw_text
 from ditdml.data_interfaces.things_data_interface import ThingsDataInterface
 from ditdml.data_interfaces.ihsj_data_interface import IHSJDataInterface
+from ditdml.data_interfaces.yummly_data_interface import YummlyDataInterface
 
 
 VISUALIZATION_WIDTH, VISUALIZATION_HEIGHT = 512, 512
@@ -96,7 +97,7 @@ class TripletVisualization:
 if __name__ == "__main__":
     # Parse command line arguments.
     parser = argparse.ArgumentParser()
-    parser.add_argument("--dataset-name", help="Name of dataset.", required=True, choices=["things", "ihsj"])
+    parser.add_argument("--dataset-name", help="Name of dataset.", required=True, choices=["things", "ihsj", "yummly"])
     parser.add_argument("--data-directory-name", help="Root folder for the raw data.", required=True)
     parser.add_argument("--split-type", help="Dataset split type.", required=True)
     parser.add_argument("--seed", help="Seed for random number generator.", type=int, required=True)
@@ -104,11 +105,15 @@ if __name__ == "__main__":
     parser.add_argument("--initial-triplet-index", help="Triplet to show first.", type=int, required=False, default=1)
     args = parser.parse_args()
 
-    # Make the data interface object and start the visualization.
+    # Make the data interface object.
     if args.dataset_name == "things":
         data_interface = ThingsDataInterface(args.data_directory_name, args.split_type, args.seed)
     elif args.dataset_name == "ihsj":
         data_interface = IHSJDataInterface(args.data_directory_name, args.split_type, args.seed)
+    elif args.dataset_name == "yummly":
+        data_interface = YummlyDataInterface(args.data_directory_name, args.split_type, args.seed)
     else:
         data_interface = None
+
+    # Start the visualization.
     TripletVisualization(data_interface, args.subset_name, args.initial_triplet_index - 1)
