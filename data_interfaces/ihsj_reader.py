@@ -57,6 +57,32 @@ def _load_triplets(catalog_file_name, trials_file_name):
     return triplets
 
 
+def _load_ninelets(catalog_file_name, trials_file_name):
+    stimulus_id, stimulus_filepath, _, _ = _load_catalog(catalog_file_name)
+
+    index_remapping = {}
+    for old_index, file_name in zip(stimulus_id, stimulus_filepath):
+        file_name = file_name.decode("utf-8")
+        i, j = file_name.rfind("_"), file_name.rfind(".")
+        new_index = int(file_name[(i + 1) : j]) - 1
+        index_remapping[old_index] = new_index
+
+    obs = psiz.trials.load_trials(trials_file_name)
+
+    n = len(obs.stimulus_set)
+    ninelets = np.zeros((n, 9), dtype=np.int32)
+
+    for i, (image_indexes, selected_mask) in enumerate(zip(obs.stimulus_set, obs.is_select())):
+        canonical_image_indexes = (
+            [image_indexes[0]]
+            + [image_indexes[j] for j, s in enumerate(selected_mask) if s]
+            + [image_indexes[j] for j, s in enumerate(selected_mask) if (j > 0) and (not s)]
+        )
+        ninelets[i, :] = [index_remapping[j] for j in canonical_image_indexes]
+
+    return ninelets
+
+
 class IHSJReader:
     """Basic loading functionality for data in the IHSJ dataset."""
 
@@ -67,6 +93,7 @@ class IHSJReader:
         "catalog": ("val", "catalogs", "psiz0.4.1", "catalog.hdf5"),
         "trials": ("val", "obs", "psiz0.4.1", "obs-195.hdf5"),
         "cached_triplets": ("triplets.npy",),
+        "cached_ninelets": ("ninelets.npy",),
     }
 
     def __init__(self, directory_name):
@@ -80,10 +107,11 @@ class IHSJReader:
         print("loading IHSJ data...")
         start_time = time.time()
 
-        # Load image and triplet data.
+        # Load image and triplet + ninelet data.
         self._load_class_mapping()
         self._load_image_info()
         self._load_triplets_cached()
+        self._load_ninelets_cached()
 
         print("done ({:.2f} s)".format(time.time() - start_time))
 
@@ -106,6 +134,10 @@ class IHSJReader:
     @property
     def triplets(self):
         return self._triplets
+
+    @property
+    def ninelets(self):
+        return self._ninelets
 
     def _load_class_mapping(self):
         # Load the class ids and names.
@@ -147,3 +179,14 @@ class IHSJReader:
             self._triplets = np.load(file_name)
 
         self._triplets = self._triplets.tolist()
+
+    def _load_ninelets_cached(self):
+        file_name = self._resource_paths["cached_ninelets"]
+        if not os.path.exists(file_name):
+            self._ninelets = _load_ninelets(self._resource_paths["catalog"], self._resource_paths["trials"])
+            np.save(file_name, self._ninelets)
+
+        else:
+            self._ninelets = np.load(file_name)
+
+        self._ninelets = self._ninelets.tolist()
