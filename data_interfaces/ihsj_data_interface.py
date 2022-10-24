@@ -50,6 +50,10 @@ class IHSJDataInterface:
         return self._reader
 
     @property
+    def triplets(self):
+        return self._reader.triplets
+
+    @property
     def triplets_by_subset(self):
         """Triplets of instance indexes for training, validation and test."""
 
@@ -68,7 +72,7 @@ class IHSJDataInterface:
         return self._instances_by_subset
 
     def _split_triplets(self, split_type):
-        triplets = self._reader.triplets
+        triplets = self.triplets
 
         # Switch on split type.
         if split_type == "by_instance":
