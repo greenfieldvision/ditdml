@@ -16,16 +16,29 @@ if __name__ == "__main__":
     )
     parser.add_argument("--data-directory-name", help="Root folder for the raw data.", required=True)
     parser.add_argument("--split-type", help="Dataset split type.", required=True)
+    parser.add_argument(
+        "--class-triplet-conversion-type", help="Class triplet conversion type.", required=False, default=None
+    )
     parser.add_argument("--seed", help="Seed for random number generator.", type=int, required=True)
     args = parser.parse_args()
 
     # Make the data interface object.
     if args.dataset_name == "things":
-        interface = ThingsDataInterface(args.data_directory_name, args.split_type, args.seed)
+        interface = ThingsDataInterface(
+            args.data_directory_name,
+            args.split_type,
+            args.seed,
+            class_triplet_conversion_type=args.class_triplet_conversion_type,
+        )
     elif args.dataset_name == "ihsj":
         interface = IHSJDataInterface(args.data_directory_name, args.split_type, args.seed)
     elif args.dataset_name == "ihsjc":
-        interface = IHSJCDataInterface(args.data_directory_name, args.split_type, args.seed)
+        interface = IHSJCDataInterface(
+            args.data_directory_name,
+            args.split_type,
+            args.seed,
+            class_triplet_conversion_type=args.class_triplet_conversion_type,
+        )
     elif args.dataset_name == "yummly":
         interface = YummlyDataInterface(args.data_directory_name, args.split_type, args.seed)
     else:
@@ -38,6 +51,7 @@ if __name__ == "__main__":
     # Print data statistics.
     print("number of images: {}".format(reader.num_images))
     print("number of classes: {}".format(reader.num_classes))
+    print("number of raw triplets: {}".format(len(interface.raw_triplets)))
     print(
         "number of triplets by subset: training {} validation {} test {}".format(
             len(triplets_by_subset["training"]), len(triplets_by_subset["validation"]), len(triplets_by_subset["test"])
