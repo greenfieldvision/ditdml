@@ -157,6 +157,7 @@ class IHSJReader:
         # Initialize the image records to an empty list.
         self._image_records = []
 
+        # Make the image records based on the image file names.
         image_directory_name = self._resource_paths["image_directory"]
         for file_name in sorted(os.listdir(image_directory_name)):
             full_file_name = os.path.join(image_directory_name, file_name)

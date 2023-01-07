@@ -105,7 +105,7 @@ class DataInterfaceWithClasses(DataInterface):
                     class_triplets_by_subset, classes_by_subset, class_triplet_conversion_type
                 )
             else:
-                raise NotImplementedError()
+                raise NotImplementedError("Could not recognize type of raw triplets.")
 
         elif split_type == "by_class_same_training_validation":
             # Split triplets by class, making the training and validation class sets the same.
@@ -127,7 +127,7 @@ class DataInterfaceWithClasses(DataInterface):
                     class_triplets_by_subset, classes_by_subset, class_triplet_conversion_type
                 )
             else:
-                raise NotImplementedError()
+                raise NotImplementedError("Could not recognize type of raw triplets.")
 
         else:
             super()._split_dataset(split_type)
@@ -167,4 +167,4 @@ class DataInterfaceWithClasses(DataInterface):
             }
 
         else:
-            raise NotImplementedError()
+            raise NotImplementedError("Could not recognize type of class triplet conversion.")
