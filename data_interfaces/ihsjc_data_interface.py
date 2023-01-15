@@ -8,7 +8,7 @@ from ditdml.data_interfaces.ihsj_reader import IHSJReader
 
 
 class IHSJCDataInterface(DataInterfaceWithClasses):
-    """Interface to data the IHSJC dataset: image file names and triplets split into training, validation and test."""
+    """Interface to data in the IHSJC dataset: image file names and triplets split into training, validation and test."""
 
     NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET = 17
 

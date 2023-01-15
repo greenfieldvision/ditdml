@@ -8,7 +8,7 @@ from ditdml.data_interfaces.things_reader import ThingsReader
 
 
 class ThingsDataInterface(DataInterfaceWithClasses):
-    """Interface to data the THINGS dataset: image file names and triplets split into training, validation and test.
+    """Interface to data in the THINGS dataset: image file names and triplets split into training, validation and test.
 
     Converts class triplets to image triplets by choosing a prototype image per class randomly. Provides access to
     additional data via the encapsulated reader object; see comments for `ThingsReader` for fields.

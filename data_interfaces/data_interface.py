@@ -71,6 +71,8 @@ class DataInterfaceWithClasses(DataInterface):
 
     @abstractproperty
     def raw_triplet_type(self):
+        """The type of raw triplets: instance or class based."""
+
         return NotImplementedError()
 
     def _choose_prototypes(self):

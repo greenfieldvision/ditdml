@@ -7,7 +7,7 @@ from ditdml.data_interfaces.yummly_reader import YummlyReader
 
 
 class YummlyDataInterface(DataInterface):
-    """Interface to data the Yummly dataset: image file names and triplets split into training, validation and test."""
+    """Interface to data in the Yummly dataset: image file names and triplets split into training, validation and test."""
 
     TRAINING_FRACTION1, VALIDATION_FRACTION1 = 0.6, 0.2
     TRAINING_FRACTION2 = 0.8

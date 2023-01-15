@@ -56,7 +56,7 @@ class YummlyReader:
 
     @property
     def num_classes(self):
-        return len(self._image_records)
+        return None
 
     @property
     def class_names(self):
