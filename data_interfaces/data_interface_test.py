@@ -1,4 +1,21 @@
+import random
 import unittest
+
+from collections import namedtuple
+
+from data_interface import DataInterface
+
+
+class DataInterfaceMock(DataInterface):
+    def __init__(self, num_images, raw_triplets):
+        self._reader = namedtuple("Reader", "num_images")(num_images)
+        self._raw_triplets = raw_triplets
+
+        self._triplets_by_subset = {None: raw_triplets}
+        self._instances_by_subset = {None: list(range(num_images))}
+
+    def raw_triplets(self):
+        return self._raw_triplets
 
 
 class DataInterfaceTest(unittest.TestCase):
@@ -52,3 +69,36 @@ class DataInterfaceTest(unittest.TestCase):
                 instances1_set = set(data_interface1.instances_by_subset[subset_name])
                 instances2_set = set(data_interface2.instances_by_subset[subset_name])
                 self.assertNotEqual(instances1_set, instances2_set)
+
+    def test_calculate_num_triplets_per_instance_small(self):
+        data_interface = DataInterfaceMock(10, [[0, 1, 2], [0, 2, 3], [4, 5, 6], [4, 7, 8], [0, 4, 8]])
+
+        self.assertEqual(data_interface.calculate_num_triplets_per_instance(), [3, 1, 2, 1, 3, 1, 1, 1, 2, 0])
+
+    def test_calculate_num_triplets_per_instance_random_small_coverage(self):
+        random.seed(42)
+
+        num_images = 1000
+        data_interface = DataInterfaceMock(num_images, [tuple(random.sample(range(num_images), 3)) for _ in range(100)])
+
+        num_triplets_per_instance = data_interface.calculate_num_triplets_per_instance()
+        self.assertEqual(min(num_triplets_per_instance), 0)
+        self.assertLessEqual(max(num_triplets_per_instance), 30)
+        self.assertAlmostEqual(
+            sum(num_triplets_per_instance) / (len(num_triplets_per_instance) + 1e-9), 0.3, delta=0.001
+        )
+
+    def test_calculate_num_triplets_per_instance_random_large_coverage(self):
+        random.seed(42)
+
+        num_images = 1000
+        data_interface = DataInterfaceMock(
+            num_images, [tuple(random.sample(range(num_images), 3)) for _ in range(10000)]
+        )
+
+        num_triplets_per_instance = data_interface.calculate_num_triplets_per_instance()
+        self.assertGreater(min(num_triplets_per_instance), 0)
+        self.assertLessEqual(max(num_triplets_per_instance), 60)
+        self.assertAlmostEqual(
+            sum(num_triplets_per_instance) / (len(num_triplets_per_instance) + 1e-9), 30.0, delta=0.001
+        )

@@ -4,6 +4,7 @@ import random
 import ditdml.data_interfaces.data_interface_detail as data_interface_detail
 
 from abc import ABC, abstractmethod, abstractproperty
+from collections import Counter
 
 
 class DataInterface(ABC):
@@ -34,6 +35,14 @@ class DataInterface(ABC):
         """Raw triplet data from the reader (eg class triplets)."""
 
         raise NotImplementedError()
+
+    def calculate_num_triplets_per_instance(self):
+        """Calculate for each instance the number of triplets it appears in."""
+
+        occurrences = Counter([i for ts in self._triplets_by_subset.values() for t in ts for i in t])
+        num_triplets_per_instance = [occurrences.get(i, 0) for i in range(self._reader.num_images)]
+
+        return num_triplets_per_instance
 
     def _split_dataset(self, split_type):
         """Split the original sets of triplets and instances into subsets for training, validation and test."""
