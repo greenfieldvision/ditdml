@@ -54,6 +54,14 @@ python ditdml/tools/report_data_statistics.py --dataset-name things --data-direc
 python ditdml/tools/report_data_statistics.py --dataset-name things --data-directory-name {THINGS_ROOT} --split-type by_class_same_training_validation --class-triplet-conversion-type all_instances --seed 13
 python ditdml/tools/report_data_statistics.py --dataset-name things --data-directory-name {THINGS_ROOT} --split-type by_class_same_training_validation --class-triplet-conversion-type prototypes --seed 13
 
+python ditdml/tools/report_data_statistics.py --dataset-name ihsjc --data-directory-name {IHSJ_ROOT} --split-type by_class --class-triplet-conversion-type all_instances --seed 15
+python ditdml/tools/report_data_statistics.py --dataset-name ihsjc --data-directory-name {IHSJ_ROOT} --split-type by_class --class-triplet-conversion-type prototypes --seed 15
+python ditdml/tools/report_data_statistics.py --dataset-name ihsjc --data-directory-name {IHSJ_ROOT} --split-type by_class_same_training_validation --class-triplet-conversion-type all_instances --seed 15
+python ditdml/tools/report_data_statistics.py --dataset-name ihsjc --data-directory-name {IHSJ_ROOT} --split-type by_class_same_training_validation --class-triplet-conversion-type prototypes --seed 15
+
+python ditdml/tools/report_data_statistics.py --dataset-name yummly --data-directory-name {YUMMLY_ROOT} --split-type same_training_validation_test --seed 16
+python ditdml/tools/report_data_statistics.py --dataset-name yummly --data-directory-name {YUMMLY_ROOT} --split-type by_instance --seed 16
+python ditdml/tools/report_data_statistics.py --dataset-name yummly --data-directory-name {YUMMLY_ROOT} --split-type by_instance_same_training_validation --seed 16
 ```
 
 To interactively visualize labeled triplets:
@@ -64,11 +72,18 @@ python ditdml/tools/visualize_triplets.py --dataset-name things --data-directory
 python ditdml/tools/visualize_triplets.py --dataset-name things --data-directory-name {THINGS_ROOT} --split-type by_class --class-triplet-conversion-type prototypes --seed 23 --subset-name validation --initial-triplet-index 42
 python ditdml/tools/visualize_triplets.py --dataset-name things --data-directory-name {THINGS_ROOT} --split-type by_class_same_training_validation --class-triplet-conversion-type all_instances --seed 23 --subset-name test --initial-triplet-index 101
 python ditdml/tools/visualize_triplets.py --dataset-name things --data-directory-name {THINGS_ROOT} --split-type by_class_same_training_validation --class-triplet-conversion-type prototypes --seed 23 --subset-name training --initial-triplet-index 22
+
+python ditdml/tools/visualize_triplets.py --dataset-name ihsjc --data-directory-name {IHSJ_ROOT} --split-type by_class --seed 25 --subset-name test --initial-triplet-index 200
+python ditdml/tools/visualize_triplets.py --dataset-name ihsjc --data-directory-name {IHSJ_ROOT} --split-type by_class --class-triplet-conversion-type prototypes --seed 25 --subset-name validation --initial-triplet-index 300
+
+python ditdml/tools/visualize_triplets.py --dataset-name yummly --data-directory-name {YUMMLY_ROOT} --split-type same_training_validation_test --seed 26 --subset-name training --initial-triplet-index 222
+python ditdml/tools/visualize_triplets.py --dataset-name yummly --data-directory-name {YUMMLY_ROOT} --split-type by_instance --seed 26 --subset-name test --initial-triplet-index 333
+python ditdml/tools/visualize_triplets.py --dataset-name yummly --data-directory-name {YUMMLY_ROOT} --split-type by_instance_same_training_validation --seed 26 --subset-name validation --initial-triplet-index 444
 ```
 
 (press left, right arrows)
 
-To interactively visualize neighbors according to the provided embedding:
+To interactively visualize neighbors according to the provided embedding for THINGS:
 
 ```
 python ditdml/tools/visualize_neighbors.py --data-directory-name {THINGS_ROOT} --num-neighbors 4 --initial-class-index 1854
@@ -76,10 +91,10 @@ python ditdml/tools/visualize_neighbors.py --data-directory-name {THINGS_ROOT} -
 
 (press left, right arrows)
 
-To interactively visualize the similarity matrix together with image pairs:
+To interactively visualize the similarity matrix for THINGS:
 
 ```
 python ditdml/tools/visualize_similarity_matrix.py --data-directory-name {THINGS_ROOT}
 ```
 
-(click on matrix elements in left pane)
+(click on matrix elements in left pane to show image pairs)
