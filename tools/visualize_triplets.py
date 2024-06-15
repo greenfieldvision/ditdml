@@ -105,16 +105,29 @@ if __name__ == "__main__":
     parser.add_argument("--split-type", help="Dataset split type.", required=True)
     parser.add_argument("--seed", help="Seed for random number generator.", type=int, required=True)
     parser.add_argument("--subset-name", help="Subset to visualize.", required=False, default="training")
+    parser.add_argument(
+        "--class-triplet-conversion-type", help="Class triplet conversion type.", required=False, default=None
+    )
     parser.add_argument("--initial-triplet-index", help="Triplet to show first.", type=int, required=False, default=1)
     args = parser.parse_args()
 
     # Make the data interface object.
     if args.dataset_name == "things":
-        data_interface = ThingsDataInterface(args.data_directory_name, args.split_type, args.seed)
+        data_interface = ThingsDataInterface(
+            args.data_directory_name,
+            args.split_type,
+            args.seed,
+            class_triplet_conversion_type=args.class_triplet_conversion_type,
+        )
     elif args.dataset_name == "ihsj":
         data_interface = IHSJDataInterface(args.data_directory_name, args.split_type, args.seed)
     elif args.dataset_name == "ihsjc":
-        data_interface = IHSJCDataInterface(args.data_directory_name, args.split_type, args.seed)
+        data_interface = IHSJCDataInterface(
+            args.data_directory_name,
+            args.split_type,
+            args.seed,
+            class_triplet_conversion_type=args.class_triplet_conversion_type,
+        )
     elif args.dataset_name == "yummly":
         data_interface = YummlyDataInterface(args.data_directory_name, args.split_type, args.seed)
     else:
