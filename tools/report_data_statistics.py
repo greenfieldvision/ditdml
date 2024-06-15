@@ -52,6 +52,7 @@ def make_data_interface(args):
 def report_statistics(data_interface):
     #  Get the reader and the triplets for training, test and validation.
     reader = data_interface.reader
+    instances_by_subset = data_interface.instances_by_subset
     triplets_by_subset = data_interface.triplets_by_subset
 
     # Print basic data statistics.
@@ -59,6 +60,13 @@ def report_statistics(data_interface):
     print("number of images: {}".format(reader.num_images))
     print("number of classes: {}".format(reader.num_classes))
     print("number of raw triplets: {}".format(len(data_interface.raw_triplets)))
+    print(
+        "number of images by subset: training {} validation {} test {}".format(
+            len(instances_by_subset["training"]),
+            len(instances_by_subset["validation"]),
+            len(instances_by_subset["test"]),
+        )
+    )
     print(
         "number of triplets by subset: training {} validation {} test {}".format(
             len(triplets_by_subset["training"]), len(triplets_by_subset["validation"]), len(triplets_by_subset["test"])
