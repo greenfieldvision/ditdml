@@ -10,7 +10,7 @@ from ditdml.data_interfaces.ihsj_reader import IHSJReader
 class IHSJCDataInterface(DataInterfaceWithClasses):
     """Interface to data in the IHSJC dataset: image file names and triplets split into training, validation and test."""
 
-    NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET = 17
+    NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET = 3
 
     def __init__(self, directory_name, split_type, seed, **kwargs):
         # Make reader object that loads the data from the specified directory.

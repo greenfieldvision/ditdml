@@ -14,7 +14,7 @@ class ThingsDataInterface(DataInterfaceWithClasses):
     additional data via the encapsulated reader object; see comments for `ThingsReader` for fields.
     """
 
-    NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET = 5
+    NUM_INSTANCE_SAMPLES_FOR_CLASS_TRIPLET = 2
 
     def __init__(self, directory_name, split_type, seed, **kwargs):
         # Make reader object that loads the data from the specified directory.
