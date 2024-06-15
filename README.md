@@ -1,6 +1,6 @@
 # Data Interfaces for Triplet-based Distance Metric Learning
 
-Interfaces to the THINGS (<a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0223792">1</a> <a href="https://www.nature.com/articles/s41562-020-00951-3">2</a>), IHSJ (<a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Roads_Enriching_ImageNet_With_Human_Similarity_Judgments_and_Psychological_Embeddings_CVPR_2021_paper.pdf">3</a> <a href="https://osf.io/cn2s3/">4</a>) and Yummly (<a href="file:///home/rdondera/Downloads/13152-Article%20Text-16669-1-2-20201228.pdf">5</a> <a href="https://vision.cornell.edu/se3/projects/cost-effective-hits/">6</a>) datasets that produce data for triplet-based distance metric learning.
+Interfaces to the THINGS (<a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0223792">1</a> <a href="https://www.nature.com/articles/s41562-020-00951-3">2</a>), IHSJ (<a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Roads_Enriching_ImageNet_With_Human_Similarity_Judgments_and_Psychological_Embeddings_CVPR_2021_paper.pdf">3</a> <a href="https://osf.io/cn2s3/">4</a>) and Yummly (<a href="https://ojs.aaai.org/index.php/HCOMP/article/view/13152/13000">5</a> <a href="https://vision.cornell.edu/se3/projects/cost-effective-hits/">6</a>) datasets that produce data for triplet-based distance metric learning.
 
 The code is close to production grade and provides an effective way to access triplet labeled datasets for distance metric learning.
 
