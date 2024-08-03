@@ -13,6 +13,7 @@ The code is close to production grade and provides an effective way to access tr
 * scikit-learn
 * Pillow
 * Tkinter
+* psiz==0.5.1
 
 ## Instructions for Use
 
@@ -43,7 +44,7 @@ The code includes functionality to split the triplets into training, validation 
 
 ## Tools
 
-All tools must be run from the parent folder of ditdml.
+All tools must be run from the ditdml folder.
 
 To see statistics like the number of images etc:
 

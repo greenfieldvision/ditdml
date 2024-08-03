@@ -3,7 +3,6 @@ import time
 
 import h5py
 import numpy as np
-import psiz
 
 
 def _load_catalog(file_name):
@@ -28,6 +27,8 @@ def _load_catalog(file_name):
 
 
 def _load_triplets(catalog_file_name, trials_file_name):
+    import psiz
+
     stimulus_id, stimulus_filepath, _, _ = _load_catalog(catalog_file_name)
 
     index_remapping = {}
@@ -58,6 +59,8 @@ def _load_triplets(catalog_file_name, trials_file_name):
 
 
 def _load_ninelets(catalog_file_name, trials_file_name):
+    import psiz
+
     stimulus_id, stimulus_filepath, _, _ = _load_catalog(catalog_file_name)
 
     index_remapping = {}
