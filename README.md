@@ -19,17 +19,17 @@ The code is close to production grade and provides an effective way to access tr
 
 ### THINGS
 
-1. Navigate to the <a href="https://osf.io/jum2f/">main THINGS dataset page on OSF</a> and download the Main folder as a zip archive.
-2. Unzip the archive and its subarchives to folder {THINGS_ROOT}/Main.
+1. Navigate to the <a href="https://osf.io/jum2f/">main THINGS dataset page on OSF</a> and download the files images-THINGS.zip and password_images.txt.
+2. Unzip the archive using the password in password_images.txt to folder {THINGS_ROOT}/Main.
 3. Navigate to the "Revealing the multidimensional mental representations..." <a href="https://osf.io/z2784/">page on OSF</a> and download both the "data" and the "variables" folder as zip archives.
 4. Unzip the two archives to folder {THINGS_ROOT}/Revealing.
-5. Ask the corresponding author of the <a href="https://www.nature.com/articles/s41562-020-00951-3">THINGS dataset</a> for the labeled triplet data.
+5. Ask the corresponding author of the <a href="https://www.nature.com/articles/s41562-020-00951-3">THINGS dataset</a> for the labeled triplet data. <b>Shortcut</b>: download the files from [here](data/things/Revealing/triplets/).
 6. Place the files in {THINGS_ROOT}/Revealing/triplets.
 
 ### IHSJC
 
 1. Download the ImageNet dataset to folder {IHSJ_ROOT}/imagenet.
-2. Navigate to the <a href="https://osf.io/7f96y/">IHSJ dataset page on OSF</a> and download the file data/deprecated/psiz0.4.1/catalog.hdf5 to folder {IHSJ_ROOT}/val/catalogs/psiz0.4.1 and data/deprecated/psiz0.4.1/obs-195.hd5 to folder {IHSJ_ROOT}/val/obs/psiz0.4.1.
+2. Navigate to the <a href="https://osf.io/7f96y/">IHSJ dataset page on OSF</a> and download the file data/deprecated/psiz0.4.1/catalog.hdf5 to folder {IHSJ_ROOT}/val/catalogs/psiz0.4.1 and data/deprecated/psiz0.4.1/obs-195.hdf5 to folder {IHSJ_ROOT}/val/obs/psiz0.4.1.
 
 ### Yummly
 
